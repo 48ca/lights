@@ -24,7 +24,7 @@ int* colors;
 int num_lights = NUM_LIGHTS;
 
 double theta_offset = 0;
-double turn_increment = M_PI/16;
+double turn_increment = M_PI/360;
 
 void generateFunctions() {
     register int i;
@@ -56,10 +56,10 @@ void drawLights() {
     for(i=0;i<num_lights;++i) {
         for(xi=0;xi<win_width;++xi) {
             x = win_width/2 * (1 +  cos(thetas[i] + theta_offset));
-            y = 10 * coeffs[i] * pow(powers[i], xi/win_width) + 50;
-            printf("%d %d\n", x, y);
+            y = 100 * coeffs[i] * pow(powers[i], xi/win_width) + 200;
             if(y >= 0 && y < win_height) {
                 glBegin(GL_POINTS);
+				glColor3f(255, 255, 255); // black
                 glVertex2f(x,y);
                 glEnd();
             }
@@ -78,6 +78,14 @@ void keyfunc(unsigned char key, int xscr, int yscr) {
 
 void displayfunc() {
 	glClear(GL_COLOR_BUFFER_BIT); // | GL_DEPTH_BUFFER_BIT);
+
+    glBegin(GL_POLYGON);
+    glColor3f(0,0,0);
+    glVertex2f(0,0);
+    glVertex2f(win_width, 0);
+    glVertex2f(0, win_height);
+    glVertex2f(win_width, win_height);
+    glEnd();
 
     drawLights();
 
