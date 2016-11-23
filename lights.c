@@ -19,7 +19,7 @@ int* colors;
 
 #define COLOR_CHOICES 1
 
-#define NUM_LIGHTS 500
+#define NUM_LIGHTS 40
 
 int num_lights = NUM_LIGHTS;
 
@@ -55,11 +55,11 @@ void drawLights() {
     register int xi;
     for(i=0;i<num_lights;++i) {
         for(xi=0;xi<win_width;++xi) {
-            x = win_width/2 * (1 +  cos(thetas[i] + theta_offset));
-            y = 100 * coeffs[i] * pow(powers[i], xi/win_width) + 200;
+            x = win_width/2.0 + xi/2.0 *  cos(thetas[i] + theta_offset);
+            y = win_height/2.0 * coeffs[i] * pow((double)(xi - win_width/4)/win_width, powers[i]) + win_height/4;
             if(y >= 0 && y < win_height) {
                 glBegin(GL_POINTS);
-				glColor3f(255, 255, 255); // black
+                glColor3f(255, 255, 255); // black
                 glVertex2f(x,y);
                 glEnd();
             }
@@ -68,16 +68,16 @@ void drawLights() {
 }
 
 void keyfunc(unsigned char key, int xscr, int yscr) {
-	switch(key) {
-		case 'q':
-			printf("Exiting\n");
-			exit(0);
-			break;
+    switch(key) {
+        case 'q':
+            printf("Exiting\n");
+            exit(0);
+            break;
     }
 }
 
 void displayfunc() {
-	glClear(GL_COLOR_BUFFER_BIT); // | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT); // | GL_DEPTH_BUFFER_BIT);
 
     glBegin(GL_POLYGON);
     glColor3f(0,0,0);
@@ -87,46 +87,53 @@ void displayfunc() {
     glVertex2f(win_width, win_height);
     glEnd();
 
+    glBegin(GL_POLYGON);
+    glVertex2f(win_width, win_height);
+    glVertex2f(0, win_height);
+    glVertex2f(win_width, 0);
+    glVertex2f(0,0);
+    glEnd();
+
     drawLights();
 
     theta_offset += turn_increment;
 
-	glutSwapBuffers();
+    glutSwapBuffers();
 
     glutPostRedisplay();
 };
 
 void reshapefunc(int wscr,int hscr)
 {
-	win_width = wscr;
-	win_height = hscr;
-	aspect = (double)(win_width) / win_height;
-	glViewport(0,0,(GLsizei)win_width,(GLsizei)win_height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0.0,1.0*win_width,0.0,1.0*win_height);
-	glMatrixMode(GL_MODELVIEW);
-	glutPostRedisplay();
+    win_width = wscr;
+    win_height = hscr;
+    aspect = (double)(win_width) / win_height;
+    glViewport(0,0,(GLsizei)win_width,(GLsizei)win_height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0,1.0*win_width,0.0,1.0*win_height);
+    glMatrixMode(GL_MODELVIEW);
+    glutPostRedisplay();
 }
 
 int main(int argc, char** argv) {
 
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(win_width,win_height);
-	glutInitWindowPosition(100,100);
-	glutCreateWindow("");
-	glClearColor(1.0,1.0,1.0,0.0);
-	glShadeModel(GL_SMOOTH);
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(win_width,win_height);
+    glutInitWindowPosition(100,100);
+    glutCreateWindow("");
+    glClearColor(1.0,1.0,1.0,0.0);
+    glShadeModel(GL_SMOOTH);
 
     srand(time(NULL));
 
     generateFunctions();
 
-	glutReshapeFunc(reshapefunc);
-	glutDisplayFunc(displayfunc);
-	glutKeyboardFunc(keyfunc);
-	glutMainLoop();
+    glutReshapeFunc(reshapefunc);
+    glutDisplayFunc(displayfunc);
+    glutKeyboardFunc(keyfunc);
+    glutMainLoop();
 
     return 0;
 }
